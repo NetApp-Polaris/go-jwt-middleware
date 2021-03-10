@@ -207,7 +207,8 @@ func (m *JWTMiddleware) CheckJWT(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		e, ok := err.(*jwt.ValidationError)
 		// Return an error if the cast didn't work, or the error was not caused by the IAT validation
-		if !ok || ok && e.Errors & jwt.ValidationErrorIssuedAt == 0 {
+		nonIatErrsDetected := e.Errors &^ jwt.ValidationErrorIssuedAt != 0
+		if !ok || ok && nonIatErrsDetected {
 			m.logf("Error parsing token: %v", err)
 			m.Options.ErrorHandler(w, r, err.Error())
 			return fmt.Errorf("Error parsing token: %w", err)
