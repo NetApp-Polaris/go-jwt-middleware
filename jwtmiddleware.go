@@ -205,9 +205,13 @@ func (m *JWTMiddleware) CheckJWT(w http.ResponseWriter, r *http.Request) error {
 
 	// Check if there was an error in parsing...
 	if err != nil {
-		m.logf("Error parsing token: %v", err)
-		m.Options.ErrorHandler(w, r, err.Error())
-		return fmt.Errorf("Error parsing token: %w", err)
+		e, ok := err.(*jwt.ValidationError)
+		// Return an error if the cast didn't work, or the error was not caused by the IAT validation
+		if !ok || ok && e.Errors & jwt.ValidationErrorIssuedAt == 0 {
+			m.logf("Error parsing token: %v", err)
+			m.Options.ErrorHandler(w, r, err.Error())
+			return fmt.Errorf("Error parsing token: %w", err)
+		}
 	}
 
 	if m.Options.SigningMethod != nil && m.Options.SigningMethod.Alg() != parsedToken.Header["alg"] {
