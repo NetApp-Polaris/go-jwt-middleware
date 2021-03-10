@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	jwtmiddleware "github.com/NetApp-Polaris/go-jwt-middleware"
+	jwtmiddleware "github.com/netapp-polaris/go-jwt-middleware"
 	"github.com/form3tech-oss/jwt-go"
 	"github.com/go-martini/martini"
 )
