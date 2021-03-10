@@ -1,4 +1,4 @@
-module github.com/NetApp-Polaris/go-jwt-middleware
+module github.com/netapp-polaris/go-jwt-middleware
 
 go 1.14
 
