@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/form3tech-oss/jwt-go"
 	"github.com/gorilla/mux"
@@ -87,6 +88,19 @@ func TestAuthenticatedRequest(t *testing.T) {
 			responseString := string(responseBytes)
 			// check that the encoded data in the jwt was properly returned as json
 			So(strings.TrimSpace(responseString), ShouldEqual, "Expected RS256 signing method but token specified HS256")
+		})
+		Convey("Authenticated GET to /protected path should return a 200 response regardless of IAT claim value", func() {
+			expectedAlgorithm := jwt.SigningMethodHS256
+			crazyTime := 2 * time.Now().Unix()
+			w := makeAuthenticatedRequest("GET", "/protected", jwt.MapClaims{"foo": "bar", "iat": crazyTime}, expectedAlgorithm)
+			So(w.Code, ShouldEqual, http.StatusOK)
+			responseBytes, err := ioutil.ReadAll(w.Body)
+			if err != nil {
+				panic(err)
+			}
+			responseString := string(responseBytes)
+			// check that the encoded data in the jwt was properly returned as json
+			So(responseString, ShouldEqual, `{"text":"bar"}`)
 		})
 	})
 }
