@@ -213,6 +213,7 @@ func (m *JWTMiddleware) CheckJWT(w http.ResponseWriter, r *http.Request) error {
 			m.Options.ErrorHandler(w, r, err.Error())
 			return fmt.Errorf("Error parsing token: %w", err)
 		}
+		parsedToken.Valid = true
 	}
 
 	if m.Options.SigningMethod != nil && m.Options.SigningMethod.Alg() != parsedToken.Header["alg"] {
